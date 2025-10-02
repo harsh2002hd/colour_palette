@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colour Palette Art Curator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 i {
+            color: var(--primary);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--gray);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background-color: rgba(99, 102, 241, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .upload-area:hover i {
+            color: var(--primary);
+        }
+
+        .upload-text {
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-create {
+            background: linear-gradient(90deg, var(--secondary), #db2777);
+        }
+
+        .btn-create:hover {
+            box-shadow: 0 4px 8px rgba(236, 72, 153, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 20px auto;
+            border-radius: 12px;
+            display: block;
+            box-shadow: var(--card-shadow);
+        }
+
+        .color-palette {
+            display: flex;
+            margin: 30px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .color-box {
+            flex: 1;
+            height: 60px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 5px;
+        }
+
+        .color-label {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .artwork-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .artwork-card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .artwork-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .artwork-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .artwork-info {
+            padding: 15px;
+        }
+
+        .artwork-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .artwork-source {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--gray);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: var(--card-shadow);
+            z-index: 1000;
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-palette"></i> Colour Palette Art Curator
+            </div>
+            <p class="tagline">Upload a photo of your room and discover or create artwork that matches your space</p>
+        </header>
+        
+        <div class="grid">
+            <section class="card">
+                <h2><i class="fas fa-upload"></i> Upload Your Room</h2>
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p class="upload-text">Drag & drop your image here or click to browse</p>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-folder-open"></i> Choose File
+                    </button>
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                </div>
+                
+                <div id="previewContainer">
+                    <img id="imagePreview" class="hidden" alt="Preview">
+                </div>
+                
+                <div id="colorPalette" class="color-palette hidden"></div>
+                
+                <div id="actionButtons" class="actions hidden">
+                    <button id="curateBtn" class="btn">
+                        <i class="fas fa-search"></i> Curate Existing Artwork
+                    </button>
+                    <button id="createBtn" class="btn btn-create">
+                        <i class="fas fa-magic"></i> Create New Artwork
+                    </button>
+                </div>
+            </section>
+            
+            <section class="card">
+                <h2><i class="fas fa-images"></i> Results</h2>
+                <div id="resultsContainer">
+                    <div class="empty-state">
+                        <i class="fas fa-image"></i>
+                        <h3>Upload an image to get started</h3>
+                        <p>Your curated or created artwork will appear here</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <footer>
+            <p>Colour Palette Art Curator &copy; 2025 | Powered by Pollination AI</p>
+        </footer>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+
+    <script>
+        let currentImageData = null;
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('imageInput');
+        
+        // Handle drag and drop
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--primary)';
+            uploadArea.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = 'var(--gray)';
+            uploadArea.style.backgroundColor = 'transparent';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--gray)';
+            uploadArea.style.backgroundColor = 'transparent';
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelection();
+            }
+        });
+        
+        fileInput.addEventListener('change', handleFileSelection);
+        
+        document.getElementById('curateBtn').addEventListener('click', async function() {
+            if (!currentImageData) return;
+            
+            showNotification('Curating artwork...', 'success');
+            
+            try {
+                const response = await fetch('/curate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        colors: currentImageData.colors,
+                        preferences: {
+                            description: 'Artwork that complements interior design'
+                        }
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayCuratedArtwork(result.artworks);
+                    showNotification('Artwork curated successfully!', 'success');
+                } else {
+                    showNotification('Error: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error curating artwork:', error);
+                showNotification('Error curating artwork', 'error');
+            }
+        });
+        
+        document.getElementById('createBtn').addEventListener('click', async function() {
+            if (!currentImageData) return;
+            
+            // Show loading state
+            const createBtn = document.getElementById('createBtn');
+            const originalText = createBtn.innerHTML;
+            createBtn.innerHTML = '<span class="loading"></span> Creating...';
+            createBtn.disabled = true;
+            
+            showNotification('Creating artwork with Pollination AI...', 'success');
+            
+            try {
+                const response = await fetch('/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        colors: currentImageData.colors,
+                        preferences: {
+                            description: 'Modern artwork for home decoration'
+                        },
+                        style: 'modern'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    displayCreatedArtwork(result.artworks);
+                    showNotification('Artwork created successfully!', 'success');
+                } else {
+                    showNotification('Error: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error creating artwork:', error);
+                showNotification('Error creating artwork', 'error');
+            } finally {
+                // Reset button
+                createBtn.innerHTML = originalText;
+                createBtn.disabled = false;
+            }
+        });
+        
+        async function handleFileSelection() {
+            const file = fileInput.files[0];
+            if (!file) return;
+            
+            displayImagePreview(file);
+            
+            // Show loading state
+            const uploadArea = document.querySelector('.upload-area');
+            uploadArea.innerHTML = '<span class="loading"></span> Processing image...';
+            
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    currentImageData = result.data;
+                    displayColorPalette(result.data.colors);
+                    document.getElementById('actionButtons').classList.remove('hidden');
+                    document.getElementById('resultsContainer').innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>Image processed successfully</h3>
+                            <p>Choose an action below to get started</p>
+                        </div>
+                    `;
+                    showNotification('Image uploaded successfully!', 'success');
+                } else {
+                    showNotification('Error: ' + result.error, 'error');
+                    uploadArea.innerHTML = `
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p class="upload-text">Drag & drop your image here or click to browse</p>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-folder-open"></i> Choose File
+                        </button>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                showNotification('Error uploading image', 'error');
+                uploadArea.innerHTML = `
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p class="upload-text">Drag & drop your image here or click to browse</p>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-folder-open"></i> Choose File
+                    </button>
+                `;
+            }
+        }
+        
+        function displayImagePreview(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('imagePreview');
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function displayColorPalette(colors) {
+            const paletteContainer = document.getElementById('colorPalette');
+            paletteContainer.innerHTML = '';
+            
+            colors.forEach(color => {
+                const colorBox = document.createElement('div');
+                colorBox.className = 'color-box';
+                colorBox.style.backgroundColor = color;
+                
+                const colorLabel = document.createElement('div');
+                colorLabel.className = 'color-label';
+                colorLabel.textContent = color;
+                
+                colorBox.appendChild(colorLabel);
+                paletteContainer.appendChild(colorBox);
+            });
+            
+            paletteContainer.classList.remove('hidden');
+        }
+        
+        function displayCuratedArtwork(artworks) {
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = '<h3>Curated Artwork</h3><p>These artworks match your color palette:</p>';
+            
+            const grid = document.createElement('div');
+            grid.className = 'artwork-grid';
+            
+            artworks.forEach(artwork => {
+                const card = document.createElement('div');
+                card.className = 'artwork-card';
+                
+                card.innerHTML = `
+                    <img src="${artwork.url}" alt="${artwork.title}" class="artwork-image" onerror="this.src='https://placehold.co/300x200?text=Artwork+Image'">
+                    <div class="artwork-info">
+                        <div class="artwork-title">${artwork.title}</div>
+                        <div class="artwork-source">Source: ${artwork.source}</div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+            
+            container.appendChild(grid);
+        }
+        
+        function displayCreatedArtwork(artworks) {
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = '<h3>Created Artwork</h3><p>These artworks were generated using Pollination AI:</p>';
+            
+            const grid = document.createElement('div');
+            grid.className = 'artwork-grid';
+            
+            artworks.forEach(artwork => {
+                const card = document.createElement('div');
+                card.className = 'artwork-card';
+                
+                // Using Pollination AI endpoint
+                const imageUrl = artwork.url;
+                
+                card.innerHTML = `
+                    <img src="${imageUrl}" alt="Generated Artwork" class="artwork-image" onerror="this.src='https://placehold.co/300x200?text=Generating+Artwork'">
+                    <div class="artwork-info">
+                        <div class="artwork-title">Generated Artwork</div>
+                        <div class="artwork-source">Created with Pollination AI</div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+            
+            container.appendChild(grid);
+        }
+        
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
